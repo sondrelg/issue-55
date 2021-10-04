@@ -1,0 +1,39 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+
+  pull_request:
+    branches: [main]
+
+  workflow_dispatch:
+
+jobs:
+  test-poetry-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: snok/install-poetry@v1
+
+      - run: poetry config --list
+      
+      - run: poetry config virtualenvs.in-project false
+      
+      - run: poetry config --list
+      
+      - run: poetry config virtualenvs.in-project true
+      
+      - run: poetry config --list
+      
+      - uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - run: poetry install
